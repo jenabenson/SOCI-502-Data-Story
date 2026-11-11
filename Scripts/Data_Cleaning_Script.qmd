@@ -1,0 +1,147 @@
+---
+title: "Data_Cleaning_Script"
+author: "Jena Benson"
+date: 10/27/2026
+format: pdf
+---
+
+```{r}
+#| message: false
+
+# install.packages(tidyverse)
+# install.packages("dplyr")
+# install.packages("knitr")
+# install.packages("tinytable")
+# install.packages("readr")
+
+library(tidyverse)
+library(dplyr)
+library(knitr)
+library(tinytable)
+library(readr)
+```
+
+```{r}
+# Reading in raw data, skipping 8 lines of title and notes, and ignoring
+# footnotes below the 13 rows of data
+
+raw_data <- read_csv(
+  "Commute_Data.csv",
+  skip = 8,
+  n_max = 13,
+  col_names = FALSE,
+  col_types = cols(.default = col_character())
+  )
+
+raw_data
+
+
+```
+
+```{r}
+# Slicing out header rows and dropping the first column (row labels)
+
+headers <- raw_data |>
+  slice(1:6) |>
+  select(-1) |>
+  as.matrix()
+```
+
+
+```{r}
+# Creating labels for every column
+
+col_labels <- tibble(
+  col = seq_len(ncol(headers)), 
+  geography = headers[1, ], 
+  age = headers[3, ], 
+  gender = headers[4, ], 
+  duration = headers[6, ]
+) |> 
+  fill(geography, age, gender)
+
+col_labels
+```
+
+```{r}
+# Creating rows for each number (stacking long data) & ensuring that columns
+# align with the numbers from the previous chunk 
+
+long_data <- raw_data |> 
+  slice(8:13) |> 
+  rename(mode = X1) |> 
+  pivot_longer(-mode, names_to = "col", values_to = "value") |>
+  mutate(col = parse_number(col) - 1)
+
+long_data
+
+unique(long_data$mode)
+```
+
+```{r}
+# Joining data with labels 
+
+long_data_w_columns <- long_data |> 
+  left_join(col_labels, by = "col")
+
+long_data_w_columns
+
+unique(long_data_w_columns$mode)
+```
+
+```{r}
+# Cleaning text to remove unnecessary numbers and characters 
+
+cleaned_long_data <- long_data_w_columns |> 
+  mutate(
+    mode = str_remove(mode, "\\s+\\d+$"), 
+    geography = str_remove(geography, "\\s+i\\d+$"), 
+    gender = str_remove(gender, "\\s+\\d+$"), 
+    count = parse_number(value)
+  )
+
+cleaned_long_data
+
+unique(cleaned_long_data$mode)
+```
+
+```{r}
+# Filtering table to keep only "Car, truck or van", Public transit", 
+# "Active transportation", and "Other method" (the two "driver" and 
+# "passenger" modes would overlap with "Car, truck or van" and would therefore
+# double-count people)
+
+modes_keep <- c("Car, truck or van", "Public transit", "Active transportation", 
+                "Other method")
+
+final_cleaned_commute <- cleaned_long_data |> 
+  filter(
+    age == "Total - Age", 
+    duration == "Total - Commuting duration", 
+    mode %in% modes_keep
+  ) |>
+  select(geography, gender, mode, count)
+
+final_cleaned_commute
+
+unique(final_cleaned_commute$mode)
+```
+
+```{r}
+# stopifnot(nrow(final_cleaned_commute) == 13 * 2 * 4, !anyNA(commute$count))
+
+# Commented out because this is not true and therefore would not let me 
+# render the PDF to submit for my Week 8 Practice. 
+```
+
+```{r}
+# I am realizing that this table does not have "Other method" included in 
+# the table, despite me selecting it to download with the CSV on Stats Canada. 
+# This is next up on my to-do list to fix.
+
+count(cleaned_long_data, mode)
+```
+
+```{r}
+read.csv("Commute_Data_Database.csv")
+```

@@ -1,0 +1,143 @@
+---
+title: "SOCI 502 Data Story"
+author: "Jena Benson"
+date: "October 17, 2026"
+format: html
+bibliography: bibliography.bib
+nocite: |
+  @*
+--- 
+
+# MILESTONE 1: QUESTION AND SIMULATION
+## Research Question: 
+Do Canadian men and women choose different commuting modes and if so, does this
+gender difference vary by province/territory?
+
+## Dataset: 
+The dataset that I have selected is Table 98-10-0458-01 [@MainModeofCommuting] 
+from the 2021 Canadian Census. This dataset includes information on Canadians' 
+choice of commuting mode, duration of commute, time leaving for work, age, and 
+gender, categorized by province/territory. 
+
+## Plans for Data Story:
+I plan to compare transit use of Canadian men and women across all 13 provinces 
+and territories in Canada to see if there are patterns that can be identified, 
+when comparing transit use with total commuters in each province.
+
+I hypothesize that women across each province will have higher transit use rates
+than their male counterparts, and that the provinces with the highest rates of 
+transit use will be large provinces with sophisticated transit networks. This
+will be proven if Women+ transit rates across the 13 Canadian provinces and
+territories are greater than those of Men+ and if transit rates are highest
+within "large_tier" provinces and lowest within "small_tier" provinces.
+
+## Simulated Code and Data:
+
+```{r}
+#| message: false
+
+#### Workspace Setup #### 
+
+# install.packages("tidyverse") 
+# install.packages("dplyr")
+# install.packages("knitr")
+# install.packages("tinytable")
+
+library(tidyverse)
+library(dplyr)
+library(knitr)
+library(tinytable)
+```
+
+```{r}
+set.seed(723) # makes the simulation reproducible
+
+# Naming simulated objects (note that "provinces" includes both Canadian 
+# provinces and territories for simplicity)
+
+provinces <- c(
+  "Newfoundland and Labrador", "Prince Edward Island", "Nova Scotia", 
+  "New Brunswick", "Quebec", "Ontario", "Manitoba", "Saskatchewan", "Alberta", 
+  "British Columbia", "Yukon", "Northwest Territories", "Nunavut"
+)
+```
+
+```{r}
+# Rough relative size of each workforce (approx. in thousands, per gender)
+
+workforce_k <- c(90, 35, 220, 175, 2000, 3500, 290, 240, 1000, 1100, 10, 10, 10)
+
+# Simulating provinces' workforce numbers by gender with ±10% difference
+
+sim_grid <- expand_grid(geography = provinces, gender = c("Men+", "Women+")) |>
+  mutate(
+    total = round(rep(workforce_k, each = 2) * 1000 * runif(26, 0.9, 1.1))
+  )
+
+sim_grid
+```
+
+```{r}
+# Baseline probability of using transit, set in three simple tiers (based on 
+# expectation, not estimates from data)
+
+# Large transit systems (Quebec, Ontario, BC): 8% 
+# Medium transit systems (Nova Scotia, Manitoba, Alberta): 4% 
+# All other provinces and territories: 2% 
+
+large_tier <- c("Quebec", "Ontario", "British Columbia")
+medium_tier <- c("Nova Scotia", "Manitoba", "Alberta")
+small_tier <- c("Yukon", "Northwest Territories", "Nunavut", 
+                "Prince Edward Island", "Newfoundland and Labrador", 
+                "Saskatchewan", "New Brunswick")
+
+base_p <- case_when(
+  provinces %in% large_tier  ~ 0.08, 
+  provinces %in% medium_tier ~ 0.04, 
+  provinces %in% small_tier  ~ 0.02
+)
+
+base_logit <- qlogis(base_p) # convert to the log-odds scale used by the model
+```
+
+```{r}
+# Gender effect on the log-odds scale: women are assumed to be higher on average 
+# (+0.25), and the size of the gap varies randomly by province. 
+# This variation is the interaction I want to detect.
+
+gender_effect <- 0.25 + rnorm(13, mean = 0, sd = 0.15)
+
+sim_grid <- sim_grid |>
+  mutate(
+    province_id = match(geography, provinces), 
+    logit_p = base_logit[province_id] + 
+      if_else(gender == "Women+", gender_effect[province_id], 0), 
+    p_transit = plogis(logit_p), 
+    transit = rbinom(n(), size = total, prob = p_transit), 
+    share = transit / total
+    ) |> 
+  select(geography, gender, transit, total, share)
+
+print(sim_grid)
+```
+```{r}
+sim_grid |>
+  tt() |>
+  style_tt(j= 1:5, align = "llrrr")|>
+  format_tt(j = 3:4, digits = 4, num_mark_big = ",", num_fmt = "decimal") |>
+  format_tt(j = 5, fn = scales::label_percent(accuracy = 0.1)) |>
+  setNames(c("Province", "Gender", "Transit Users", "Total Commuters", "Share"))
+```
+
+```{r}
+ggplot(sim_grid, aes(x = share, y = fct_reorder(geography, share), 
+                     colour = gender)) +
+  geom_point (size = 2) + 
+  scale_x_continuous(labels = scales::percent) +
+  labs(title = "Simulated share of commuters using public transit", 
+       x = "Share of commuters", y = "Canadian provinces and territories", 
+       colour = "Gender") + 
+  theme_minimal()
+```
+
+
