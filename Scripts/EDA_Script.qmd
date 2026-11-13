@@ -3,3 +3,42 @@ title: "EDA_Script"
 format: html
 ---
 
+```{r}
+# install.packages(tidyverse)
+# install.packages("dplyr")
+# install.packages("knitr")
+# install.packages("tinytable")
+# install.packages("readr")
+
+library(tidyverse)
+library(dplyr)
+library(knitr)
+library(tinytable)
+library(readr)
+```
+
+```{r}
+clean_data <- read.csv("Cleaned_Commute.csv")
+
+head(clean_data)
+```
+
+```{r}
+tail(clean_data)
+```
+
+```{r}
+clean_data |>
+slice_sample(n = 6)
+```
+
+```{r}
+clean_data |>
+  glimpse()
+```
+
+```{r}
+clean_data |>
+  summary()
+```
+
