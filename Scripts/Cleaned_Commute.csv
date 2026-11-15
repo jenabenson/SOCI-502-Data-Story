@@ -1,105 +1,105 @@
-Geography,Gender,Mode,Count
-Alberta,Men+,Active transportation,35425
-Alberta,Men+,"Car, truck or van",765905
-Alberta,Men+,Other method,20820
-Alberta,Men+,Public transit,39920
-Alberta,Women+,Active transportation,38755
-Alberta,Women+,"Car, truck or van",612780
-Alberta,Women+,Other method,17040
-Alberta,Women+,Public transit,48340
-British Columbia,Men+,Active transportation,74175
-British Columbia,Men+,"Car, truck or van",824995
-British Columbia,Men+,Other method,23635
-British Columbia,Men+,Public transit,72290
-British Columbia,Women+,Active transportation,84165
-British Columbia,Women+,"Car, truck or van",672775
-British Columbia,Women+,Other method,19900
-British Columbia,Women+,Public transit,101755
-Manitoba,Men+,Active transportation,16055
-Manitoba,Men+,"Car, truck or van",244870
-Manitoba,Men+,Other method,4935
-Manitoba,Men+,Public transit,12095
-Manitoba,Women+,Active transportation,16780
-Manitoba,Women+,"Car, truck or van",200200
-Manitoba,Women+,Other method,4925
-Manitoba,Women+,Public transit,17250
-New Brunswick,Men+,Active transportation,6585
-New Brunswick,Men+,"Car, truck or van",138920
-New Brunswick,Men+,Other method,3035
-New Brunswick,Men+,Public transit,1975
-New Brunswick,Women+,Active transportation,6845
-New Brunswick,Women+,"Car, truck or van",130295
-New Brunswick,Women+,Other method,2685
-New Brunswick,Women+,Public transit,2370
-Newfoundland and Labrador,Men+,Active transportation,3895
-Newfoundland and Labrador,Men+,"Car, truck or van",78195
-Newfoundland and Labrador,Men+,Other method,5485
-Newfoundland and Labrador,Men+,Public transit,2145
-Newfoundland and Labrador,Women+,Active transportation,5015
-Newfoundland and Labrador,Women+,"Car, truck or van",80950
-Newfoundland and Labrador,Women+,Other method,1955
-Newfoundland and Labrador,Women+,Public transit,1440
-Northwest Territories,Men+,Active transportation,1785
-Northwest Territories,Men+,"Car, truck or van",7025
-Northwest Territories,Men+,Other method,735
-Northwest Territories,Men+,Public transit,80
-Northwest Territories,Women+,Active transportation,2110
-Northwest Territories,Women+,"Car, truck or van",6450
-Northwest Territories,Women+,Other method,355
-Northwest Territories,Women+,Public transit,65
-Nova Scotia,Men+,Active transportation,10110
-Nova Scotia,Men+,"Car, truck or van",157980
-Nova Scotia,Men+,Other method,4075
-Nova Scotia,Men+,Public transit,6205
-Nova Scotia,Women+,Active transportation,10470
-Nova Scotia,Women+,"Car, truck or van",135685
-Nova Scotia,Women+,Other method,3795
-Nova Scotia,Women+,Public transit,7695
-Nunavut,Men+,Active transportation,1785
-Nunavut,Men+,"Car, truck or van",3060
-Nunavut,Men+,Other method,595
-Nunavut,Men+,Public transit,55
-Nunavut,Women+,Active transportation,2215
-Nunavut,Women+,"Car, truck or van",2700
-Nunavut,Women+,Other method,625
-Nunavut,Women+,Public transit,45
-Ontario,Men+,Active transportation,120245
-Ontario,Men+,"Car, truck or van",2161945
-Ontario,Men+,Other method,47155
-Ontario,Men+,Public transit,163395
-Ontario,Women+,Active transportation,125805
-Ontario,Women+,"Car, truck or van",1628600
-Ontario,Women+,Other method,59495
-Ontario,Women+,Public transit,226745
-Prince Edward Island,Men+,Active transportation,1355
-Prince Edward Island,Men+,"Car, truck or van",30460
-Prince Edward Island,Men+,Other method,545
-Prince Edward Island,Men+,Public transit,420
-Prince Edward Island,Women+,Active transportation,1485
-Prince Edward Island,Women+,"Car, truck or van",28255
-Prince Edward Island,Women+,Other method,530
-Prince Edward Island,Women+,Public transit,470
-Quebec,Men+,Active transportation,105155
-Quebec,Men+,"Car, truck or van",1430735
-Quebec,Men+,Other method,28740
-Quebec,Men+,Public transit,120460
-Quebec,Women+,Active transportation,113910
-Quebec,Women+,"Car, truck or van",1202535
-Quebec,Women+,Other method,25900
-Quebec,Women+,Public transit,166885
-Saskatchewan,Men+,Active transportation,11285
-Saskatchewan,Men+,"Car, truck or van",208585
-Saskatchewan,Men+,Other method,4280
-Saskatchewan,Men+,Public transit,3030
-Saskatchewan,Women+,Active transportation,13865
-Saskatchewan,Women+,"Car, truck or van",180445
-Saskatchewan,Women+,Other method,4225
-Saskatchewan,Women+,Public transit,4900
-Yukon,Men+,Active transportation,955
-Yukon,Men+,"Car, truck or van",8265
-Yukon,Men+,Other method,190
-Yukon,Men+,Public transit,205
-Yukon,Women+,Active transportation,1185
-Yukon,Women+,"Car, truck or van",8145
-Yukon,Women+,Other method,170
-Yukon,Women+,Public transit,280
+Geography,Gender,Mode,Count,Total,Percent
+Alberta,Men+,Active transportation,35425,862070,4.109295068845918
+Alberta,Men+,"Car, truck or van",765905,862070,88.84487338615193
+Alberta,Men+,Other method,20820,862070,2.4151171018594777
+Alberta,Men+,Public transit,39920,862070,4.630714443142668
+Alberta,Women+,Active transportation,38755,716915,5.405801245614891
+Alberta,Women+,"Car, truck or van",612780,716915,85.47456811476954
+Alberta,Women+,Other method,17040,716915,2.3768508121604373
+Alberta,Women+,Public transit,48340,716915,6.742779827455138
+British Columbia,Men+,Active transportation,74175,995095,7.454062174968219
+British Columbia,Men+,"Car, truck or van",824995,995095,82.90615468874832
+British Columbia,Men+,Other method,23635,995095,2.3751501112959064
+British Columbia,Men+,Public transit,72290,995095,7.264633024987564
+British Columbia,Women+,Active transportation,84165,878595,9.579499086609871
+British Columbia,Women+,"Car, truck or van",672775,878595,76.57396183679624
+British Columbia,Women+,Other method,19900,878595,2.2649798826535545
+British Columbia,Women+,Public transit,101755,878595,11.581559193940324
+Manitoba,Men+,Active transportation,16055,277955,5.776114838732888
+Manitoba,Men+,"Car, truck or van",244870,277955,88.09699411775287
+Manitoba,Men+,Other method,4935,277955,1.775467251893292
+Manitoba,Men+,Public transit,12095,277955,4.351423791620946
+Manitoba,Women+,Active transportation,16780,239155,7.0163701365223385
+Manitoba,Women+,"Car, truck or van",200200,239155,83.71140055612469
+Manitoba,Women+,Other method,4925,239155,2.0593339047897805
+Manitoba,Women+,Public transit,17250,239155,7.212895402563191
+New Brunswick,Men+,Active transportation,6585,150515,4.374979237949706
+New Brunswick,Men+,"Car, truck or van",138920,150515,92.29644885891771
+New Brunswick,Men+,Other method,3035,150515,2.0164103245523703
+New Brunswick,Men+,Public transit,1975,150515,1.3121615785802079
+New Brunswick,Women+,Active transportation,6845,142195,4.813812018706706
+New Brunswick,Women+,"Car, truck or van",130295,142195,91.63121066141566
+New Brunswick,Women+,Other method,2685,142195,1.8882520482436091
+New Brunswick,Women+,Public transit,2370,142195,1.6667252716340237
+Newfoundland and Labrador,Men+,Active transportation,3895,89720,4.341283994650022
+Newfoundland and Labrador,Men+,"Car, truck or van",78195,89720,87.15448060633081
+Newfoundland and Labrador,Men+,Other method,5485,89720,6.1134641105662055
+Newfoundland and Labrador,Men+,Public transit,2145,89720,2.390771288452965
+Newfoundland and Labrador,Women+,Active transportation,5015,89360,5.612130707251567
+Newfoundland and Labrador,Women+,"Car, truck or van",80950,89360,90.588630259624
+Newfoundland and Labrador,Women+,Other method,1955,89360,2.1877797672336614
+Newfoundland and Labrador,Women+,Public transit,1440,89360,1.611459265890779
+Northwest Territories,Men+,Active transportation,1785,9625,18.545454545454547
+Northwest Territories,Men+,"Car, truck or van",7025,9625,72.98701298701299
+Northwest Territories,Men+,Other method,735,9625,7.636363636363637
+Northwest Territories,Men+,Public transit,80,9625,0.8311688311688312
+Northwest Territories,Women+,Active transportation,2110,8980,23.49665924276169
+Northwest Territories,Women+,"Car, truck or van",6450,8980,71.82628062360801
+Northwest Territories,Women+,Other method,355,8980,3.953229398663697
+Northwest Territories,Women+,Public transit,65,8980,0.7238307349665924
+Nova Scotia,Men+,Active transportation,10110,178370,5.667993496664237
+Nova Scotia,Men+,"Car, truck or van",157980,178370,88.56870549980378
+Nova Scotia,Men+,Other method,4075,178370,2.284577002859225
+Nova Scotia,Men+,Public transit,6205,178370,3.478724000672759
+Nova Scotia,Women+,Active transportation,10470,157645,6.641504646515905
+Nova Scotia,Women+,"Car, truck or van",135685,157645,86.06996733166291
+Nova Scotia,Women+,Other method,3795,157645,2.407307558121095
+Nova Scotia,Women+,Public transit,7695,157645,4.881220463700086
+Nunavut,Men+,Active transportation,1785,5495,32.48407643312102
+Nunavut,Men+,"Car, truck or van",3060,5495,55.6869881710646
+Nunavut,Men+,Other method,595,5495,10.828025477707007
+Nunavut,Men+,Public transit,55,5495,1.0009099181073704
+Nunavut,Women+,Active transportation,2215,5585,39.659803043867505
+Nunavut,Women+,"Car, truck or van",2700,5585,48.343777976723366
+Nunavut,Women+,Other method,625,5585,11.190689346463742
+Nunavut,Women+,Public transit,45,5585,0.8057296329453895
+Ontario,Men+,Active transportation,120245,2492740,4.82380833941767
+Ontario,Men+,"Car, truck or van",2161945,2492740,86.72966294118119
+Ontario,Men+,Other method,47155,2492740,1.8916934778597043
+Ontario,Men+,Public transit,163395,2492740,6.554835241541436
+Ontario,Women+,Active transportation,125805,2040645,6.164962548605955
+Ontario,Women+,"Car, truck or van",1628600,2040645,79.80809988998575
+Ontario,Women+,Other method,59495,2040645,2.9154997562045333
+Ontario,Women+,Public transit,226745,2040645,11.111437805203748
+Prince Edward Island,Men+,Active transportation,1355,32780,4.133618059792556
+Prince Edward Island,Men+,"Car, truck or van",30460,32780,92.92251372788286
+Prince Edward Island,Men+,Other method,545,32780,1.6625991458206222
+Prince Edward Island,Men+,Public transit,420,32780,1.2812690665039659
+Prince Edward Island,Women+,Active transportation,1485,30740,4.830839297332465
+Prince Edward Island,Women+,"Car, truck or van",28255,30740,91.91607026675341
+Prince Edward Island,Women+,Other method,530,30740,1.7241379310344827
+Prince Edward Island,Women+,Public transit,470,30740,1.5289525048796355
+Quebec,Men+,Active transportation,105155,1685090,6.240319508156834
+Quebec,Men+,"Car, truck or van",1430735,1685090,84.90555400601748
+Quebec,Men+,Other method,28740,1685090,1.7055468847361268
+Quebec,Men+,Public transit,120460,1685090,7.148579601089557
+Quebec,Women+,Active transportation,113910,1509230,7.547557363688768
+Quebec,Women+,"Car, truck or van",1202535,1509230,79.67871033573411
+Quebec,Women+,Other method,25900,1509230,1.7161068889433684
+Quebec,Women+,Public transit,166885,1509230,11.057625411633747
+Saskatchewan,Men+,Active transportation,11285,227180,4.96742671009772
+Saskatchewan,Men+,"Car, truck or van",208585,227180,91.81486046306894
+Saskatchewan,Men+,Other method,4280,227180,1.883968659212959
+Saskatchewan,Men+,Public transit,3030,227180,1.3337441676203892
+Saskatchewan,Women+,Active transportation,13865,203435,6.81544473664807
+Saskatchewan,Women+,"Car, truck or van",180445,203435,88.69909307641262
+Saskatchewan,Women+,Other method,4225,203435,2.0768304372403965
+Saskatchewan,Women+,Public transit,4900,203435,2.408631749698921
+Yukon,Men+,Active transportation,955,9615,9.932397295891835
+Yukon,Men+,"Car, truck or van",8265,9615,85.95943837753511
+Yukon,Men+,Other method,190,9615,1.9760790431617263
+Yukon,Men+,Public transit,205,9615,2.132085283411336
+Yukon,Women+,Active transportation,1185,9780,12.116564417177914
+Yukon,Women+,"Car, truck or van",8145,9780,83.28220858895705
+Yukon,Women+,Other method,170,9780,1.738241308793456
+Yukon,Women+,Public transit,280,9780,2.8629856850715747
