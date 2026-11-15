@@ -1,33 +1,42 @@
 ---
 title: "EDA_Script"
+author: Jena Benson 
+date: November 15, 2026
 format: html
 ---
 
 ```{r}
+#| message: false 
+
 # install.packages(tidyverse)
 # install.packages("dplyr")
 # install.packages("knitr")
 # install.packages("tinytable")
 # install.packages("readr")
+install.packages("ggrepel")
 
 library(tidyverse)
 library(dplyr)
 library(knitr)
 library(tinytable)
 library(readr)
+library(ggrepel)
 ```
 
 ```{r}
+# Beginning with head and tail of data
+
 clean_data <- read.csv("Cleaned_Commute.csv")
 
 head(clean_data)
-```
-
-```{r}
 tail(clean_data)
 ```
 
 ```{r}
+# Random slice of 6 rows from data frame. Seed used to ensure reproducibility
+
+set.seed(723)
+
 clean_data |>
 slice_sample(n = 6)
 ```
@@ -40,5 +49,103 @@ clean_data |>
 ```{r}
 clean_data |>
   summary()
+```
+
+```{r}
+# Confirming categories align with expected n
+
+count(commute_clean, Mode)
+count(commute_clean, Gender)
+n_distinct(commute_clean$Geography)
+```
+
+```{r}
+# Visualizing totals for each province 
+
+summary(commute_clean$Total)
+ggplot(commute_clean, aes(x = Total)) +
+  geom_histogram(bins = 20)
+```
+
+```{r}
+# Transit share by province, men vs. women
+transit_eda <- commute_clean |> 
+  filter(Mode == "Public transit")
+
+nrow(transit_eda) # should be 26
+```
+```{r}
+ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent), 
+                        colour = Gender)) +
+  geom_point(size = 3) +
+  scale_color_manual(
+    values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) +
+  labs(
+    title = "What Does the Distribution of Transit Users Look Like Across 
+    Canadian Provinces and Territories?", 
+    x = "Commuters using public transit (%)", 
+    y = "Canadian Provinces & Territories") + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
+```
+
+```{r}
+# Visualizing gender gap (Women+ minus Men+) by province 
+
+gap <- gap |>
+  mutate(direction = if_else(gap > 0, "Women+ higher", "Men+ higher"))
+
+ggplot(gap, aes(x = gap, y = fct_reorder(Geography, gap), fill = direction)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c("Women+ higher" = "#6CCED9", "Men+ higher" = "#EC9C3E")
+  ) +
+  labs(
+    title = "Is There a Gender Gap in Canadian Transit Use?", 
+    x = "Gap in percentage points (Women+ minus Men+)",
+    y = "Canadian Provinces & Territories",
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
+```
+```{r}
+# Creating a list of province/territory abbreviations for following graph's 
+# labels (to reduce clutter)
+
+prov_abbr <- c(
+  "Newfoundland and Labrador" = "NL", 
+  "Prince Edward Island" = "PEI", 
+  "Nova Scotia" = "NS", 
+  "New Brunswick" = "NB", 
+  "Quebec" = "QC", 
+  "Ontario" = "ON", 
+  "Manitoba" = "MB", 
+  "Saskatchewan" = "SK", 
+  "Alberta" = "AB", 
+  "British Columbia" = "BC", 
+  "Yukon" = "YT", 
+  "Northwest Territories" = "NWT", 
+  "Nunavut" = "NU"
+)
+```
+
+```{r}
+# Does a place's size relate to its share?
+ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
+  geom_point(size = 3) +
+  scale_y_discrete(labels = \(x) prov_abbr[x]) +
+  geom_text_repel(aes(label = unname(prov_abbr[Geography])),
+                size = 3, show.legend = FALSE) +
+  scale_x_log10(labels = scales::label_comma()) +
+  scale_color_manual(values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) + 
+  labs(
+    title = "Does a Province/Territory Size Relate to its Share of Commuters?", 
+    x = "Total commuters (log scale)", 
+    y = "Commuters using public transit (%)", 
+    colour = "Gender"
+  ) + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
 ```
 
