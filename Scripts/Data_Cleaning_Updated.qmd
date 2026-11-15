@@ -84,6 +84,9 @@ commute_clean
 ```
 
 ```{r}
+# Adding a "Total" column to allow percentage calculation for each row of the 
+# data frame 
+
 commute_clean <- commute_clean |> 
   group_by(Geography, Gender) |> 
   mutate(Total = sum(Count)) |> 
@@ -93,6 +96,9 @@ commute_clean
 ```
 
 ```{r}
+# Adding a "Percentage" column to match with simulated data visualization and 
+# plan for EDA
+
 commute_clean <- commute_clean |> 
   mutate(Percent = Count / Total * 100)
 
@@ -100,6 +106,8 @@ commute_clean
 ```
 
 ```{r}
+# Creating easy-to-read table from commute_clean for easy viewing
+
 commute_clean |> 
   tt() |> 
   format_tt(j = c("Count", "Total"), digits = 0, num_fmt = "decimal", num_mark_big = ",") |>
