@@ -84,6 +84,31 @@ commute_clean
 ```
 
 ```{r}
+commute_clean <- commute_clean |> 
+  group_by(Geography, Gender) |> 
+  mutate(Total = sum(Count)) |> 
+  ungroup()
+
+commute_clean
+```
+
+```{r}
+commute_clean <- commute_clean |> 
+  mutate(Percent = Count / Total * 100)
+
+commute_clean
+```
+
+```{r}
+commute_clean |> 
+  tt() |> 
+  format_tt(j = c("Count", "Total"), digits = 0, num_fmt = "decimal", num_mark_big = ",") |>
+  format_tt(j = "Percent", fn = \(x) sprintf("%.1f%%", x)) |>
+  style_tt(j = 1:6, align = "lllrrr")
+```
+
+
+```{r}
 # Test to ensure "Count" = integer column & does not include negative values
 stopifnot(
   "Count must be an integer column" = is.integer(commute_clean$Count),
