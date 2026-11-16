@@ -47,12 +47,37 @@ clean_data |>
 ```
 
 ```{r}
+# Creating a summary table that is grouped by Mode & Gender to create summary 
+# statistics that are meaningful, rather than mixing four different modes of 
+# transportation (which would not create meaningful or comparable statistics)
+
 clean_data |>
-  summary()
+  group_by(Mode, Gender) |>
+  summarise( 
+    n = n(),
+    national_pct = sum(Count) / sum(Total) * 100, 
+    min_pct = min(Percent),
+    median_pct = median(Percent), 
+    mean_pct = mean(Percent), 
+    max_pct = max(Percent), 
+    .groups = "drop"
+    ) |>
+  rename(
+    "Mode" = Mode, 
+    "Gender" = Gender, 
+    "National (%)" = national_pct, 
+    "Mean (%)" = mean_pct,
+    "Median (%)" = median_pct, 
+    "Minimum (%)" = min_pct, 
+    "Maximum (%)" = max_pct
+  ) |> 
+  tt() |> 
+  format_tt(j = 3:8, digits = 1, num_fmt = "decimal") |>
+  style_tt(j = 1:8, align = "llrrrrrr")
 ```
 
 ```{r}
-# Confirming categories align with expected n
+# Testing that categories (Mode, Gender, and Geography) align with expected n
 
 count(commute_clean, Mode)
 count(commute_clean, Gender)
