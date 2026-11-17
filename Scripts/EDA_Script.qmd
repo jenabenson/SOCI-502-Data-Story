@@ -103,14 +103,6 @@ stopifnot(
 ```
 
 ```{r}
-# Visualizing distribution of commute_clean totals
-
-summary(commute_clean$Total)
-ggplot(commute_clean, aes(x = Total)) +
-  geom_histogram(bins = 20)
-```
-
-```{r}
 # Transit share by province, men vs. women
 transit_eda <- commute_clean |> 
   filter(Mode == "Public transit")
@@ -180,7 +172,7 @@ ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
   scale_y_discrete(labels = \(x) prov_abbr[x]) +
   geom_text_repel(aes(label = unname(prov_abbr[Geography])),
                 size = 3, show.legend = FALSE) +
-  scale_x_log10(labels = scales::label_comma()) +
+  scale_x_log10(labels = scales::label_comma()) + 
   scale_color_manual(values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) + 
   labs(
     title = "Does a Province/Territory Size Relate to its Share of Commuters?", 
