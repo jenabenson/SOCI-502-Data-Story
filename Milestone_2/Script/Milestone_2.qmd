@@ -45,6 +45,7 @@ commute_relabeled_cols <- raw_data |>
 
 names(commute_relabeled_cols) # Confirming renaming worked as planned
 ```
+
 ```{r}
 # Setting which modes of transportation will be kept in this dataset 
 # Filtering out "Driver with 1 or more workers", "Passenger with 2 or more
@@ -110,7 +111,8 @@ commute_clean
 
 commute_clean |> 
   tt() |> 
-  format_tt(j = c("Count", "Total"), digits = 0, num_fmt = "decimal", num_mark_big = ",") |>
+  format_tt(j = c("Count", "Total"), digits = 0, num_fmt = "decimal", 
+            num_mark_big = ",") |>
   format_tt(j = "Percent", fn = \(x) sprintf("%.1f%%", x)) |>
   style_tt(j = 1:6, align = "lllrrr")
 ```
@@ -166,7 +168,7 @@ stopifnot(
 ```
 
 ```{r}
-# Beginning with head and tail of data
+# Beginning with head and tail of data to see the top 
 
 clean_data <- read.csv("Cleaned_Commute.csv")
 
@@ -298,3 +300,5 @@ ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
   ) + 
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
+```
+
