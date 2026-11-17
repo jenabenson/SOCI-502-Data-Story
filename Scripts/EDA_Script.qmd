@@ -141,15 +141,16 @@ ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent),
 # with inverted gender differences)
 
 gap <- gap |>
-  mutate(direction = if_else(gap > 0, "Women+ higher", "Men+ higher"))
+  mutate(direction = if_else(gap_pp > 0, "Women+ higher", "Men+ higher"))
 
-ggplot(gap, aes(x = gap, y = fct_reorder(Geography, gap), fill = direction)) +
+ggplot(gap, aes(x = gap_pp, y = fct_reorder(Geography, gap_pp), fill = direction)) +
   geom_col() +
   scale_fill_manual(
     values = c("Women+ higher" = "#6CCED9", "Men+ higher" = "#EC9C3E")
   ) +
   labs(
-    title = "Is There a Gender Gap in Canadian Transit Use?", 
+    title = "What Does the Distribution of Transit Users Look Like Across 
+    Canadian Provinces and Territories?", 
     x = "Gap in percentage points (Women+ minus Men+)",
     y = "Canadian Provinces & Territories",
     fill = NULL
