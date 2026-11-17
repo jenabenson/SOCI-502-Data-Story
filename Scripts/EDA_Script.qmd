@@ -79,9 +79,27 @@ clean_data |>
 ```{r}
 # Testing that categories (Mode, Gender, and Geography) align with expected n
 
-count(commute_clean, Mode)
-count(commute_clean, Gender)
-n_distinct(commute_clean$Geography)
+mode_counts   <- count(commute_clean, Mode)
+gender_counts <- count(commute_clean, Gender)
+geography_counts <- count(commute_clean, Geography)
+
+stopifnot(
+  "Expected exactly 4 modes" = nrow(mode_counts) == 4,
+  "Each mode should have 26 rows (13 provinces x 2 genders)" = 
+    all(mode_counts$n == 26),
+  "Modes are not the expected four" = setequal(
+    mode_counts$Mode,
+    c("Car, truck or van", "Public transit", "Active transportation", 
+      "Other method")
+  ),
+  "Expected exactly 2 genders" = nrow(gender_counts) == 2,
+  "Each gender should have 52 rows (13 provinces x 4 modes)" = 
+    all(gender_counts$n == 52),
+  "Gender values are not Men+ and Women+" = 
+    setequal(gender_counts$Gender, c("Men+", "Women+")),
+  "Expected exactly 13 provinces and territories" = 
+    n_distinct(commute_clean$Geography) == 13
+)
 ```
 
 ```{r}
