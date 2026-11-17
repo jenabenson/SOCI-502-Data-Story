@@ -24,7 +24,8 @@ library(ggrepel)
 ```
 
 ```{r}
-# Beginning with head and tail of data
+# Beginning with head and tail of data to see the top 6 and bottom 6 rows of
+# the data frame
 
 clean_data <- read.csv("Cleaned_Commute.csv")
 
@@ -33,7 +34,8 @@ tail(clean_data)
 ```
 
 ```{r}
-# Random slice of 6 rows from data frame. Seed used to ensure reproducibility
+# Random slice of 6 rows from data frame to get a sense of the variation in the 
+# data frame. Seed used to ensure reproducibility
 
 set.seed(723)
 
@@ -42,6 +44,8 @@ slice_sample(n = 6)
 ```
 
 ```{r}
+# Running glimpse to check the variable class of each column of data frame
+
 clean_data |>
   glimpse()
 ```
@@ -104,12 +108,18 @@ stopifnot(
 
 ```{r}
 # Transit share by province, men vs. women
+# Writing in test to ensure that there are 26 rows
+
 transit_eda <- commute_clean |> 
   filter(Mode == "Public transit")
 
 nrow(transit_eda) # should be 26
+stopifnot(nrow(transit_eda) == 26)
 ```
 ```{r}
+# Plotting transit use percentage points by Geography & Gender to visualize
+# potential gendered and/or geographic differences in transit use.
+
 ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent), 
                         colour = Gender)) +
   geom_point(size = 3) +
@@ -125,7 +135,10 @@ ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent),
 ```
 
 ```{r}
-# Visualizing gender gap (Women+ minus Men+) by province 
+# Visualizing gender difference in transit use (Women+ minus Men+) by province 
+# to visualize which provinces/territories have the largest & smallest gender 
+# differences in transit use (as well as if there are provinces/territories 
+# with inverted gender differences)
 
 gap <- gap |>
   mutate(direction = if_else(gap > 0, "Women+ higher", "Men+ higher"))
@@ -145,8 +158,24 @@ ggplot(gap, aes(x = gap, y = fct_reorder(Geography, gap), fill = direction)) +
   theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
 ```
 ```{r}
+gap <- transit_eda |>
+  select(Geography, Gender, Percent) |>
+  pivot_wider(names_from = Gender, values_from = Percent) |>
+  mutate(
+    gap_pp = `Women+` - `Men+`,        # difference in percentage points
+    ratio  = `Women+` / `Men+`         # how many times higher women's share is
+  ) |>
+  arrange(desc(gap_pp)) 
+
+gap |>
+  tt() |>
+   format_tt(j = 4, digits = 1, num_fmt = "decimal") |>
+  setNames(c("Province", "Men+", "Women+", "Gap (pp)", "Ratio"))
+```
+
+```{r}
 # Creating a list of province/territory abbreviations for following graph's 
-# labels (to reduce clutter)
+# labels (to reduce clutter on graph)
 
 prov_abbr <- c(
   "Newfoundland and Labrador" = "NL", 
@@ -166,13 +195,22 @@ prov_abbr <- c(
 ```
 
 ```{r}
-# Does a place's size relate to its share?
+# Plotting each province/territory by transit use percentage and total number of
+# commuters (plotting each province/territory twice - one for each gender)
+# Logarithmic scale used to account for significant differences between 
+# commuter totals in small provinces/territories (such as NU, NWT, and YT) and 
+# commuter totals in large provinces (such as ON, BC, and QC)
+
 ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
   geom_point(size = 3) +
   scale_y_discrete(labels = \(x) prov_abbr[x]) +
   geom_text_repel(aes(label = unname(prov_abbr[Geography])),
                 size = 3, show.legend = FALSE) +
   scale_x_log10(labels = scales::label_comma()) + 
+  scale_y_continuous(
+    limits = c(0, 12),
+    breaks = seq(0, 12, by = 2),
+    labels = \(x) paste0(x)) +
   scale_color_manual(values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) + 
   labs(
     title = "Does a Province/Territory Size Relate to its Share of Commuters?", 
@@ -183,4 +221,22 @@ ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
 ```
+# Reflections on EDA
+I am not surprised to see that there are large variations in commuter and 
+transit totals between provinces/territories due to population numbers and 
+robustness of transit systems between large provinces (such as ON, BC, and QC) 
+and small or rural provinces/territories (such as NU, NWT, YT).
 
+Additionally, women use transit more than men in the majority of the 13 
+provinces/territories (10 of 13). While the difference between men's and women's 
+transit use is only between 0.2-4.6 percentage points (pp), it does point to a trend 
+that I would follow and examine further if I were doing statistical analysis on
+this dataset/research question.
+
+What did surprise me is that there are 3 provinces/territories that had an 
+inverse relationship between gender and transit use (NWT, NU, and NL). Upon 
+first seeing this, I wondered if this could have something to do with northern 
+climate/environment and masculinity, but upon thinking through this further, I 
+don't know if this theory would hold considering that Yukon has a positive 
+gender gap of 0.7 pp in comparison to Newfoundland & Labrador's (NL) -0.8 pp 
+gap. 
