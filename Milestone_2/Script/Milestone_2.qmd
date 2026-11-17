@@ -1,0 +1,300 @@
+---
+title: "Milestone_2"
+format: pdf
+author: Jena Benson 
+date: November 17, 2026
+---
+
+# Data Cleaning 
+
+```{r}
+#| message: false
+
+# install.packages(tidyverse)
+# install.packages("dplyr")
+# install.packages("knitr")
+# install.packages("tinytable")
+# install.packages("readr")
+
+library(tidyverse)
+library(dplyr)
+library(knitr)
+library(tinytable)
+library(readr)
+```
+
+```{r}
+# Read in raw data 
+
+raw_data <- read.csv("Commute_Data_Database.csv")
+
+raw_data
+```
+
+```{r}
+# Renaming columns that will not be dropped in next step 
+
+commute_relabeled_cols <- raw_data |>
+  rename(
+    Geography = GEO, 
+    Gender = Gender..3., 
+    Mode = Main.mode.of.commuting..11A., 
+    Immigrant_Status = Immigrant.status.and.period.of.immigration..11., 
+    Count = VALUE
+  )
+
+names(commute_relabeled_cols) # Confirming renaming worked as planned
+```
+```{r}
+# Setting which modes of transportation will be kept in this dataset 
+# Filtering out "Driver with 1 or more workers", "Passenger with 2 or more
+# workers", and "Sustainable transportation" as these include duplicates 
+# with the modes kept
+
+modes_keep <- c("Car, truck or van", "Public transit", "Active transportation", 
+                "Other method")
+
+# Filtering out unecessary columns to keep and ensuring that the "Immigrant 
+# Status" column does not include duplicates by only looking at "Total -
+# Immigrant status and period of immigration"
+commute_clean <- commute_relabeled_cols |> 
+  filter(
+    Immigrant_Status == "Total - Immigrant status and period of immigration", 
+    Mode %in% modes_keep
+  ) |> 
+  select(Geography, Gender, Mode, Count)
+
+# Test to ensure that output is correct 
+# (Should be 13 provinces x 2 genders x 4 modes of transportation)
+stopifnot(nrow(commute_clean) == 104) 
+```
+
+```{r}
+commute_clean <- commute_clean |> 
+  mutate(Count = as.integer(Count))
+
+commute_clean
+```
+
+```{r}
+commute_clean <- commute_clean |> 
+  arrange(Geography, Gender, Mode)
+
+commute_clean
+```
+
+```{r}
+# Adding a "Total" column to allow percentage calculation for each row of the 
+# data frame 
+
+commute_clean <- commute_clean |> 
+  group_by(Geography, Gender) |> 
+  mutate(Total = sum(Count)) |> 
+  ungroup()
+
+commute_clean
+```
+
+```{r}
+# Adding a "Percentage" column to match with simulated data visualization and 
+# plan for EDA
+
+commute_clean <- commute_clean |> 
+  mutate(Percent = Count / Total * 100)
+
+commute_clean
+```
+
+```{r}
+# Creating easy-to-read table from commute_clean for easy viewing
+
+commute_clean |> 
+  tt() |> 
+  format_tt(j = c("Count", "Total"), digits = 0, num_fmt = "decimal", num_mark_big = ",") |>
+  format_tt(j = "Percent", fn = \(x) sprintf("%.1f%%", x)) |>
+  style_tt(j = 1:6, align = "lllrrr")
+```
+
+```{r}
+# Test to ensure "Count" = integer column & does not include negative values
+stopifnot(
+  "Count must be an integer column" = is.integer(commute_clean$Count),
+  "Count has negative values"       = all(commute_clean$Count >= 0)
+)
+
+# Test to ensure there are no missing values in dataset
+stopifnot("Data contains missing values" = !anyNA(commute_clean))
+
+# Test to ensure there is no blank text strings in dataset
+stopifnot(
+  "Blank text found" = all(
+    commute_clean |> 
+      select(where(is.character)) |> 
+      map_lgl(\(x) all(str_trim(x) !=""))
+  )
+)
+```
+
+```{r}
+write_csv(commute_clean, "Cleaned_Commute.csv")
+```
+
+```{r}
+# Testing that categories (Mode, Gender, and Geography) align with expected n
+
+mode_counts   <- count(commute_clean, Mode)
+gender_counts <- count(commute_clean, Gender)
+geography_counts <- count(commute_clean, Geography)
+
+stopifnot(
+  "Expected exactly 4 modes" = nrow(mode_counts) == 4,
+  "Each mode should have 26 rows (13 provinces x 2 genders)" = 
+    all(mode_counts$n == 26),
+  "Modes are not the expected four" = setequal(
+    mode_counts$Mode,
+    c("Car, truck or van", "Public transit", "Active transportation", 
+      "Other method")
+  ),
+  "Expected exactly 2 genders" = nrow(gender_counts) == 2,
+  "Each gender should have 52 rows (13 provinces x 4 modes)" = 
+    all(gender_counts$n == 52),
+  "Gender values are not Men+ and Women+" = 
+    setequal(gender_counts$Gender, c("Men+", "Women+")),
+  "Expected exactly 13 provinces and territories" = 
+    n_distinct(commute_clean$Geography) == 13
+)
+```
+
+```{r}
+# Beginning with head and tail of data
+
+clean_data <- read.csv("Cleaned_Commute.csv")
+
+head(clean_data)
+tail(clean_data)
+```
+
+```{r}
+# Random slice of 6 rows from data frame. Seed used to ensure reproducibility
+
+set.seed(723)
+
+clean_data |>
+slice_sample(n = 6)
+```
+
+```{r}
+clean_data |>
+  glimpse()
+```
+
+```{r}
+# Creating a summary table that is grouped by Mode & Gender to create summary 
+# statistics that are meaningful, rather than mixing four different modes of 
+# transportation (which would not create meaningful or comparable statistics)
+
+clean_data |>
+  group_by(Mode, Gender) |>
+  summarise( 
+    n = n(),
+    national_pct = sum(Count) / sum(Total) * 100, 
+    min_pct = min(Percent),
+    median_pct = median(Percent), 
+    mean_pct = mean(Percent), 
+    max_pct = max(Percent), 
+    .groups = "drop"
+    ) |>
+  rename(
+    "Mode" = Mode, 
+    "Gender" = Gender, 
+    "National (%)" = national_pct, 
+    "Mean (%)" = mean_pct,
+    "Median (%)" = median_pct, 
+    "Minimum (%)" = min_pct, 
+    "Maximum (%)" = max_pct
+  ) |> 
+  tt() |> 
+  format_tt(j = 3:8, digits = 1, num_fmt = "decimal") |>
+  style_tt(j = 1:8, align = "llrrrrrr")
+```
+
+```{r}
+# Transit share by province, men vs. women
+transit_eda <- commute_clean |> 
+  filter(Mode == "Public transit")
+
+nrow(transit_eda) # should be 26
+```
+```{r}
+ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent), 
+                        colour = Gender)) +
+  geom_point(size = 3) +
+  scale_color_manual(
+    values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) +
+  labs(
+    title = "What Does the Distribution of Transit Users Look Like Across 
+    Canadian Provinces and Territories?", 
+    x = "Commuters using public transit (%)", 
+    y = "Canadian Provinces & Territories") + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
+```
+
+```{r}
+# Visualizing gender gap (Women+ minus Men+) by province 
+
+gap <- gap |>
+  mutate(direction = if_else(gap > 0, "Women+ higher", "Men+ higher"))
+
+ggplot(gap, aes(x = gap, y = fct_reorder(Geography, gap), fill = direction)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c("Women+ higher" = "#6CCED9", "Men+ higher" = "#EC9C3E")
+  ) +
+  labs(
+    title = "Is There a Gender Gap in Canadian Transit Use?", 
+    x = "Gap in percentage points (Women+ minus Men+)",
+    y = "Canadian Provinces & Territories",
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
+```
+```{r}
+# Creating a list of province/territory abbreviations for following graph's 
+# labels (to reduce clutter)
+
+prov_abbr <- c(
+  "Newfoundland and Labrador" = "NL", 
+  "Prince Edward Island" = "PEI", 
+  "Nova Scotia" = "NS", 
+  "New Brunswick" = "NB", 
+  "Quebec" = "QC", 
+  "Ontario" = "ON", 
+  "Manitoba" = "MB", 
+  "Saskatchewan" = "SK", 
+  "Alberta" = "AB", 
+  "British Columbia" = "BC", 
+  "Yukon" = "YT", 
+  "Northwest Territories" = "NWT", 
+  "Nunavut" = "NU"
+)
+```
+
+```{r}
+# Does a place's size relate to its share?
+ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
+  geom_point(size = 3) +
+  scale_y_discrete(labels = \(x) prov_abbr[x]) +
+  geom_text_repel(aes(label = unname(prov_abbr[Geography])),
+                size = 3, show.legend = FALSE) +
+  scale_x_log10(labels = scales::label_comma()) + 
+  scale_color_manual(values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) + 
+  labs(
+    title = "Does a Province/Territory Size Relate to its Share of Commuters?", 
+    x = "Total commuters (log scale)", 
+    y = "Commuters using public transit (%)", 
+    colour = "Gender"
+  ) + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
