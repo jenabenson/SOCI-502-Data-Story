@@ -103,7 +103,7 @@ stopifnot(
 ```
 
 ```{r}
-# Visualizing totals for each province 
+# Visualizing distribution of commute_clean totals
 
 summary(commute_clean$Total)
 ggplot(commute_clean, aes(x = Total)) +
