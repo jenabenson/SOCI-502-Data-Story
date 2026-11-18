@@ -1,6 +1,6 @@
 ---
 title: "Milestone_2"
-format: pdf
+format: html
 author: Jena Benson 
 date: November 17, 2026
 ---
@@ -15,24 +15,26 @@ date: November 17, 2026
 # install.packages("knitr")
 # install.packages("tinytable")
 # install.packages("readr")
+# install.packages("ggrepel")
 
 library(tidyverse)
 library(dplyr)
 library(knitr)
 library(tinytable)
 library(readr)
+library(ggrepel)
 ```
 
 ```{r}
 # Read in raw data 
 
+#| echo: false
 raw_data <- read.csv("Commute_Data_Database.csv")
-
-raw_data
 ```
 
 ```{r}
-# Renaming columns that will not be dropped in next step 
+# Renaming columns that will not be filtered out to remove periods and numbers 
+# (Geography, Gender, Mode, Immigrant_Status, and Count)
 
 commute_relabeled_cols <- raw_data |>
   rename(
@@ -45,19 +47,20 @@ commute_relabeled_cols <- raw_data |>
 
 names(commute_relabeled_cols) # Confirming renaming worked as planned
 ```
-
 ```{r}
 # Setting which modes of transportation will be kept in this dataset 
 # Filtering out "Driver with 1 or more workers", "Passenger with 2 or more
-# workers", and "Sustainable transportation" as these include duplicates 
-# with the modes kept
+# workers", and "Sustainable transportation" as these include overlap with 
+# "Car, truck, or van", "Public transit", "Active transportation", and "Other"
+# (the transportation modes that I am keeping in the cleaned dataset)
 
 modes_keep <- c("Car, truck or van", "Public transit", "Active transportation", 
                 "Other method")
 
-# Filtering out unecessary columns to keep and ensuring that the "Immigrant 
-# Status" column does not include duplicates by only looking at "Total -
-# Immigrant status and period of immigration"
+# Filtering out unnecessary columns and ensuring that the "Immigrant 
+# Status" column does not include duplicates in overlapping categories by only 
+# looking at "Total - Immigrant status and period of immigration"
+
 commute_clean <- commute_relabeled_cols |> 
   filter(
     Immigrant_Status == "Total - Immigrant status and period of immigration", 
@@ -65,19 +68,21 @@ commute_clean <- commute_relabeled_cols |>
   ) |> 
   select(Geography, Gender, Mode, Count)
 
-# Test to ensure that output is correct 
-# (Should be 13 provinces x 2 genders x 4 modes of transportation)
+# Test to ensure that filtered output has the number of rows (Should be 13 
+# provinces x 2 genders x 4 modes of transportation)
 stopifnot(nrow(commute_clean) == 104) 
 ```
 
 ```{r}
-commute_clean <- commute_clean |> 
-  mutate(Count = as.integer(Count))
+# Testing if Count column is the correct class (should be an integer)
 
-commute_clean
+stopifnot(is.integer(commute_clean$Count))
 ```
 
 ```{r}
+# Arranging by Geography, then Gender, then Mode to allow for easy viewing and 
+# comparison of rows
+
 commute_clean <- commute_clean |> 
   arrange(Geography, Gender, Mode)
 
@@ -97,7 +102,7 @@ commute_clean
 ```
 
 ```{r}
-# Adding a "Percentage" column to match with simulated data visualization and 
+# Adding a "Percent" column to match with simulated data visualization and 
 # plan for EDA
 
 commute_clean <- commute_clean |> 
@@ -105,9 +110,16 @@ commute_clean <- commute_clean |>
 
 commute_clean
 ```
+```{r}
+# Testing if Total and Percent columns are the correct class (Total should be 
+# an integer column and Percent should be a double format)
+
+stopifnot(is.integer(commute_clean$Total))
+stopifnot(is.double(commute_clean$Percent))
+```
 
 ```{r}
-# Creating easy-to-read table from commute_clean for easy viewing
+# Creating table from commute_clean for easy viewing
 
 commute_clean |> 
   tt() |> 
@@ -118,9 +130,8 @@ commute_clean |>
 ```
 
 ```{r}
-# Test to ensure "Count" = integer column & does not include negative values
+# Test to ensure "Count" does not include negative values
 stopifnot(
-  "Count must be an integer column" = is.integer(commute_clean$Count),
   "Count has negative values"       = all(commute_clean$Count >= 0)
 )
 
@@ -138,37 +149,44 @@ stopifnot(
 ```
 
 ```{r}
+# Writing new cleaned data CSV file
+
 write_csv(commute_clean, "Cleaned_Commute.csv")
 ```
 
 ```{r}
-# Testing that categories (Mode, Gender, and Geography) align with expected n
+# A final test to ensure that all columns (Mode, Gender, and Geography) align 
+# with expected n and include the expected content 
 
 mode_counts   <- count(commute_clean, Mode)
 gender_counts <- count(commute_clean, Gender)
 geography_counts <- count(commute_clean, Geography)
 
 stopifnot(
-  "Expected exactly 4 modes" = nrow(mode_counts) == 4,
-  "Each mode should have 26 rows (13 provinces x 2 genders)" = 
-    all(mode_counts$n == 26),
-  "Modes are not the expected four" = setequal(
-    mode_counts$Mode,
+  nrow(mode_counts) == 4,     # Expected exactly 4 modes
+  all(mode_counts$n == 26),   # Each mode should have 26 rows (13 prov x 2 
+                              # genders)
+  setequal(
+    mode_counts$Mode,         # All modes should be the expected 4 (listed in 
+                              # code)
     c("Car, truck or van", "Public transit", "Active transportation", 
-      "Other method")
-  ),
-  "Expected exactly 2 genders" = nrow(gender_counts) == 2,
-  "Each gender should have 52 rows (13 provinces x 4 modes)" = 
-    all(gender_counts$n == 52),
-  "Gender values are not Men+ and Women+" = 
-    setequal(gender_counts$Gender, c("Men+", "Women+")),
-  "Expected exactly 13 provinces and territories" = 
-    n_distinct(commute_clean$Geography) == 13
+      "Other method")),
+  nrow(gender_counts) == 2,   # Expected exactly 2 genders
+  all(gender_counts$n == 52), # Each gender should have 52 rows (13 prov x 4 
+                              # modes)" 
+  setequal(gender_counts$Gender, c("Men+", "Women+")), # Gender should be listed
+                                                       # as either "Men+" or 
+                                                       # "Women+"
+  n_distinct(commute_clean$Geography) == 13 # Expected exactly 13 provinces and 
+                                            # territories
 )
 ```
 
+# Exploratory Data Analysis
+
 ```{r}
-# Beginning with head and tail of data to see the top 
+# Beginning with head and tail of data to see the top 6 and bottom 6 values in 
+# the data frame
 
 clean_data <- read.csv("Cleaned_Commute.csv")
 
@@ -177,7 +195,8 @@ tail(clean_data)
 ```
 
 ```{r}
-# Random slice of 6 rows from data frame. Seed used to ensure reproducibility
+# Random slice of 6 rows from data frame to view a sample of what variation is 
+# in the dataset. Seed used to ensure reproducibility
 
 set.seed(723)
 
@@ -186,14 +205,19 @@ slice_sample(n = 6)
 ```
 
 ```{r}
+# Running glimpse to, once again, verify that structure of clean_data is what 
+# is expected so that EDA is done intentionally and accurately (not on data 
+# that is incorrectly cleaned or read in)
+
 clean_data |>
   glimpse()
 ```
-
 ```{r}
 # Creating a summary table that is grouped by Mode & Gender to create summary 
-# statistics that are meaningful, rather than mixing four different modes of 
-# transportation (which would not create meaningful or comparable statistics)
+# statistics that are meaningful and comparable, rather than mixing four 
+# different modes of transportation. This creates 8 rows of summary statistics 
+# (one for each mode and gender pairing) with minimum, maximum, median, and mean 
+# calculated in percentages 
 
 clean_data |>
   group_by(Mode, Gender) |>
@@ -222,17 +246,14 @@ clean_data |>
 
 ```{r}
 # Transit share by province, men vs. women
-# Writing in test to ensure that there are 26 rows
-
 transit_eda <- commute_clean |> 
   filter(Mode == "Public transit")
 
 nrow(transit_eda) # should be 26
-stopifnot(nrow(transit_eda) == 26)
 ```
 ```{r}
 # Plotting transit use percentage points by Geography & Gender to visualize
-# potential gendered and/or geographic differences in transit use.
+# potential gendered and/or geographic differences in transit use across Canada.
 
 ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent), 
                         colour = Gender)) +
@@ -247,32 +268,10 @@ ggplot(transit_eda, aes(x = Percent, y = fct_reorder(Geography, Percent),
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
 ```
-
 ```{r}
-# Visualizing gender difference in transit use (Women+ minus Men+) by province 
-# to visualize which provinces/territories have the largest & smallest gender 
-# differences in transit use (as well as if there are provinces/territories 
-# with inverted gender differences)
+# Creating a table that illustrates the exact gap between Men+ and Women+ 
+# transit use (gap measured in percentage points and calculated as ratio)
 
-gap <- gap |>
-  mutate(direction = if_else(gap > 0, "Women+ higher", "Men+ higher"))
-
-ggplot(gap, aes(x = gap, y = fct_reorder(Geography, gap), fill = direction)) +
-  geom_col() +
-  scale_fill_manual(
-    values = c("Women+ higher" = "#6CCED9", "Men+ higher" = "#EC9C3E")
-  ) +
-  labs(
-    title = "Is There a Gender Gap in Canadian Transit Use?", 
-    x = "Gap in percentage points (Women+ minus Men+)",
-    y = "Canadian Provinces & Territories",
-    fill = NULL
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
-```
-
-```{r}
 gap <- transit_eda |>
   select(Geography, Gender, Percent) |>
   pivot_wider(names_from = Gender, values_from = Percent) |>
@@ -284,8 +283,34 @@ gap <- transit_eda |>
 
 gap |>
   tt() |>
-   format_tt(j = 4, digits = 1, num_fmt = "decimal") |>
+  format_tt(j = 4, digits = 1, num_fmt = "decimal") |>
   setNames(c("Province", "Men+", "Women+", "Gap (pp)", "Ratio"))
+```
+
+```{r}
+# Visualizing gender difference in transit use (Women+ minus Men+) by province 
+# to express which provinces/territories have the largest & smallest gender 
+# differences in transit use (as well as if there are provinces/territories 
+# with inverted gender differences)
+
+gap <- gap |>
+  mutate(direction = if_else(gap_pp > 0, "Women+ higher", "Men+ higher"))
+
+ggplot(gap, aes(x = gap_pp, y = fct_reorder(Geography, gap_pp), 
+                fill = direction)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c("Women+ higher" = "#6CCED9", "Men+ higher" = "#EC9C3E")
+  ) +
+  labs(
+    title = "Do Women Use Transit More Than Men in 
+    Canadian Provinces and Territories?", 
+    x = "Gap in percentage points (Women+ minus Men+)",
+    y = "Canadian Provinces & Territories",
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
 ```
 
 ```{r}
@@ -311,14 +336,16 @@ prov_abbr <- c(
 
 ```{r}
 # Plotting each province/territory by transit use percentage and total number of
-# commuters (plotting each province/territory twice - one for each gender)
+# commuters (plotting each province/territory twice - one for each gender).
+
 # Logarithmic scale used to account for significant differences between 
 # commuter totals in small provinces/territories (such as NU, NWT, and YT) and 
-# commuter totals in large provinces (such as ON, BC, and QC)
+# commuter totals in large provinces (such as ON, BC, and QC) and prevent a
+# a large space in the centre of the graph & clustered points close together on 
+# the far ends.
 
 ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
   geom_point(size = 3) +
-  scale_y_discrete(labels = \(x) prov_abbr[x]) +
   geom_text_repel(aes(label = unname(prov_abbr[Geography])),
                 size = 3, show.legend = FALSE) +
   scale_x_log10(labels = scales::label_comma()) + 
@@ -328,7 +355,8 @@ ggplot(transit_eda, aes(x = Total, y = Percent, colour = Gender)) +
     labels = \(x) paste0(x)) +
   scale_color_manual(values = c("Women+" = "#6CCED9", "Men+" = "#EC9C3E")) + 
   labs(
-    title = "Does a Province/Territory Size Relate to its Share of Commuters?", 
+    title = "Does a Province/Territory's Population Impact 
+    their Proportion of Transit Users?", 
     x = "Total commuters (log scale)", 
     y = "Commuters using public transit (%)", 
     colour = "Gender"
@@ -344,14 +372,13 @@ and small or rural provinces/territories (such as NU, NWT, YT).
 
 Additionally, women use transit more than men in the majority of the 13 
 provinces/territories (10 of 13). While the difference between men's and women's 
-transit use is only between 0.2-4.6 percentage points (pp), it does point to a trend 
-that I would follow and examine further if I were doing statistical analysis on
-this dataset/research question.
+transit use is only between 0.2-4.6 percentage points (pp), it does point to a 
+trend that I would follow and examine further if I were doing statistical 
+analysis on this dataset/research question.
 
 What did surprise me is that there are 3 provinces/territories that had an 
 inverse relationship between gender and transit use (NWT, NU, and NL). Upon 
 first seeing this, I wondered if this could have something to do with northern 
 climate/environment and masculinity, but upon thinking through this further, I 
-don't know if this theory would hold considering that Yukon has a positive 
-gender gap of 0.7 pp in comparison to Newfoundland & Labrador's (NL) -0.8 pp 
-gap. 
+question if this theory would hold considering that Yukon has a positive gender 
+gap of 0.7 pp in comparison to Newfoundland & Labrador's (NL) -0.8 pp gap. 
