@@ -3,7 +3,16 @@ title: "Milestone_2"
 format: html
 author: Jena Benson 
 date: November 17, 2026
+bibliography: bibliography.bib
+nocite: |
+  @*
 ---
+
+# MILESTONE 2 
+In this document, I will clean, test, and explore Table 98-10-0458-01 
+[@MainModeofCommuting] from the 2021 Canadian Census with the following research 
+question in mind: Do Canadian men and women choose different commuting modes and 
+if so, does this gender difference vary by province/territory?
 
 # Data Cleaning 
 
