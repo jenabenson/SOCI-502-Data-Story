@@ -8,7 +8,7 @@ nocite: |
   @*
 ---
 
-# MILESTONE 2 
+# Introduction
 In this document, I will clean, test, and explore Table 98-10-0458-01 
 [@MainModeofCommuting] from the 2021 Canadian Census with the following research 
 question in mind: Do Canadian men and women choose different commuting modes and 
